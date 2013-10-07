@@ -1,3 +1,5 @@
+## For an up-to-date version of the ruby kernel for IPython go to https://github.com/minad/iruby
+
 ## iRuby
 This begins life as a straight line for line port of the IPython repo stored here: https://github.com/fperez/zmq-pykernel/
 
