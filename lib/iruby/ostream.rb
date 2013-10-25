@@ -27,7 +27,7 @@ module IRuby
 
     def write(s)
       raise 'I/O operation on closed file' unless @socket
-      @session.send(@socket, 'stream', { name: @name, data: s.to_s })
+      @session.send(@socket, 'stream', { :name => @name, :data => s.to_s })
       nil
     end
 

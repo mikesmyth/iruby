@@ -63,7 +63,7 @@ module IRuby
 
     def display(obj, options={})
       unless obj.nil?
-        content = { data: Display.new(obj, options).data, metadata: {}, execution_count: @execution_count }
+        content = { :data => Display.new(obj, options).data, :metadata => {}, :execution_count => @execution_count }
         @session.send(@pub_socket, 'pyout', content)
       end
       nil
@@ -71,22 +71,22 @@ module IRuby
 
     def kernel_info_request(ident, msg)
       content = {
-        protocol_version: [4, 0],
+        :protocol_version => [4, 0],
 
         # Language version number (mandatory).
         # It is Python version number (e.g., [2, 7, 3]) for the kernel
         # included in IPython.
-        language_version: RUBY_VERSION.split('.').map(&:to_i),
+        :language_version => RUBY_VERSION.split('.').map(&:to_i),
 
         # Programming language in which kernel is implemented (mandatory).
         # Kernel included in IPython returns 'python'.
-        language: 'ruby'
+        :language => 'ruby'
       }
       @session.send(@reply_socket, 'kernel_info_reply', content, ident)
     end
 
     def send_status(status)
-      @session.send(@pub_socket, 'status', execution_state: status)
+      @session.send(@pub_socket, 'status', :execution_state => status)
     end
 
     def execute_request(ident, msg)
@@ -98,26 +98,26 @@ module IRuby
       end
       @execution_count += 1 unless msg[:content].fetch('silent', false)
       send_status('busy')
-      @session.send(@pub_socket, 'pyin', code: code)
+      @session.send(@pub_socket, 'pyin', :code => code)
 
       result = nil
       begin
         result = @backend.eval(code)
         content = {
-          status: 'ok',
-          payload: [],
-          user_variables: {},
-          user_expressions: {},
-          execution_count: @execution_count
+          :status => 'ok',
+          :payload => [],
+          :user_variables => {},
+          :user_expressions => {},
+          :execution_count => @execution_count
         }
       rescue Exception => e
         content = {
-          ename: e.class.to_s,
-          evalue: e.message,
-          etype: e.class.to_s,
-          status: 'error',
-          traceback: ["#{RED}#{e.class}#{RESET}: #{e.message}", *e.backtrace.map { |l| "#{WHITE}#{l}#{RESET}" }],
-          execution_count: @execution_count
+          :ename => e.class.to_s,
+          :evalue => e.message,
+          :etype => e.class.to_s,
+          :status => 'error',
+          :traceback => ["#{RED}#{e.class}#{RESET}: #{e.message}", *e.backtrace.map { |l| "#{WHITE}#{l}#{RESET}" }],
+          :execution_count => @execution_count
         }
         @session.send(@pub_socket, 'pyerr', content)
       end
@@ -128,19 +128,19 @@ module IRuby
 
     def complete_request(ident, msg)
       content = {
-        matches: @backend.complete(msg[:content]['line'], msg[:content]['text']),
-        status: 'ok',
-        matched_text: msg[:content]['line'],
+        :matches => @backend.complete(msg[:content]['line'], msg[:content]['text']),
+        :status => 'ok',
+        :matched_text => msg[:content]['line'],
       }
       @session.send(@reply_socket, 'complete_reply', content, ident)
     end
 
     def connect_request(ident, msg)
       content = {
-        shell_port: config['shell_port'],
-        iopub_port: config['iopub_port'],
-        stdin_port: config['stdin_port'],
-        hb_port:    config['hb_port']
+        :shell_port => config['shell_port'],
+        :iopub_port => config['iopub_port'],
+        :stdin_port => config['stdin_port'],
+        :hb_port =>    config['hb_port']
       }
       @session.send(@reply_socket, 'connect_reply', content, ident)
     end
@@ -153,7 +153,7 @@ module IRuby
       # we will just send back empty history for now, pending clarification
       # as requested in ipython/ipython#3806
       content = {
-        history: []
+        :history => []
       }
       @session.send(@reply_socket, 'history_reply', content, ident)
     end
@@ -161,21 +161,21 @@ module IRuby
     def object_info_request(ident, msg)
       o = @backend.eval(msg[:content]['oname'])
       content = {
-        oname: msg[:content]['oname'],
-        found: true,
-        ismagic: false,
-        isalias: false,
-        docstring: '', # TODO
-        type_class: o.class.to_s,
-        type_class: o.class.superclass.to_s,
-        string_form: o.inspect
+        :oname => msg[:content]['oname'],
+        :found => true,
+        :ismagic => false,
+        :isalias => false,
+        :docstring => '', # TODO
+        :type_class => o.class.to_s,
+        :type_class => o.class.superclass.to_s,
+        :string_form => o.inspect
       }
       content[:length] = o.length if o.respond_to?(:length)
       @session.send(@reply_socket, 'object_info_reply', content, ident)
     rescue Exception
       content = {
-        oname: msg[:content]['oname'],
-        found: false
+        :oname => msg[:content]['oname'],
+        :found => false
       }
       @session.send(@reply_socket, 'object_info_reply', content, ident)
     end

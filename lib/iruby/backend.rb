@@ -1,7 +1,7 @@
 module IRuby
   class PlainBackend
     def initialize
-      Bond.start(debug: true)
+      Bond.start(:debug => true)
     end
 
     def eval(code)
@@ -26,7 +26,7 @@ module IRuby
       Pry.pager = false # Don't use the pager
       Pry.print = proc {|output, value|} # No result printing
       Pry.exception_handler = proc {|output, exception, _| }
-      @pry = Pry.new(output: $stdout, target: TOPLEVEL_BINDING)
+      @pry = Pry.new(:output => $stdout, :target => TOPLEVEL_BINDING)
       raise 'Falling back to plain backend since your version of Pry is too old (The Pry instance doesn\'t support #eval).' unless @pry.respond_to?(:eval)
     end
 
