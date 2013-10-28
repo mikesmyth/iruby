@@ -42,6 +42,9 @@ module IRuby
         profile = @args.grep(/\A--profile=.*\Z/).last.to_s.sub(/\A--profile=/, '')
         profile = 'default' if profile.empty?
       end
+      if @args[0] == 'kernel_only'
+        @args[0] = 'kernel'
+      end
 
       create_profile(dir, profile)
 
