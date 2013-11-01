@@ -11,7 +11,7 @@ module IRuby
     def run
       raise 'Use --iruby-dir instead of --ipython-dir!' unless @args.grep(/\A--ipython-dir=.*\Z/).empty?
 
-      if @args.first == 'kernel'
+      if @args.first == 'kernel' and @args.size > 1
         run_kernel
       else
         run_ipython
@@ -41,9 +41,6 @@ module IRuby
       else
         profile = @args.grep(/\A--profile=.*\Z/).last.to_s.sub(/\A--profile=/, '')
         profile = 'default' if profile.empty?
-      end
-      if @args[0] == 'kernel_only'
-        @args[0] = 'kernel'
       end
 
       create_profile(dir, profile)
